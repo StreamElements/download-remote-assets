@@ -51,7 +51,7 @@ if (!args.source || !args.output || !args.types.length) {
 
 const urlsMap = {};
 
-const urlRegExPattern = `\\/\\/([^/?#'" ]+)\\/[^?#'" ]+\\.(${args.types.join('|')})`;
+const urlRegExPattern = `//([^/?#'":<> ]+)/[^?#'"<> ]+\\.(${args.types.join('|')})`;
 const urlRegEx = new RegExp(urlRegExPattern, 'ig');
 
 console.log('Scanning source folder tree...');
@@ -127,4 +127,4 @@ function processNextUrl() {
 console.log(`Fetching ${urls.length} URLs...`);
 const pool = new PromisePool(processNextUrl, args.concurrency);
 
-pool.start();
+//pool.start();
