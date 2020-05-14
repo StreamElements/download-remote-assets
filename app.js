@@ -127,4 +127,4 @@ function processNextUrl() {
 console.log(`Fetching ${urls.length} URLs...`);
 const pool = new PromisePool(processNextUrl, args.concurrency);
 
-//pool.start();
+pool.start();
