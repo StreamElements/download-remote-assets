@@ -113,7 +113,9 @@ function processNextUrl() {
 
     if (url.hostname.includes('streamelements.com')) {
       // Don't allow skipping errors on .streamelements.com domain
-      throw err;
+      
+      process.exit(255);
+      //throw err;
     }
 
     ++errorCounter;
