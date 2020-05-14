@@ -44,7 +44,7 @@ const args = commandLineArgs(argsDefinitions);
 args.types = args.types.split(',').map(i => i.replace(/^\s*/, '').replace(/\s*$/, ''));
 
 if (!args.source || !args.output || !args.types.length) {
-  console.error(`Usage: ${process.argv[1]} --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4] [--concurrency=4]`);
+  console.error(`Usage: ${process.argv[1]} --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4,jpeg,webm] [--concurrency=4]`);
 
   process.exit(255);
 }
