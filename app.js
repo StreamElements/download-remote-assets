@@ -37,6 +37,7 @@ const argsDefinitions = [
   { name: 'output', type: String, alias: 'o' },
   { name: 'types', type: String, alias: 't', defaultValue: 'jpg,png,svg,mp4,jpeg,webm' },
   { name: 'concurrency', type: Number, alias: 'c', defaultValue: 4 },
+  { name: 'exclude-urls', type: String, alias: 'x', defaultValue: '' },
 ];
 
 const args = commandLineArgs(argsDefinitions);
@@ -44,7 +45,7 @@ const args = commandLineArgs(argsDefinitions);
 args.types = args.types.split(',').map(i => i.replace(/^\s*/, '').replace(/\s*$/, ''));
 
 if (!args.source || !args.output || !args.types.length) {
-  console.error(`Usage: ${process.argv[1]} --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4,jpeg,webm] [--concurrency=4]`);
+  console.error(`Usage: ${process.argv[1]} --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4,jpeg,webm] [--concurrency=4] [--exclude-urls=<regex>]`);
 
   process.exit(255);
 }
@@ -61,6 +62,9 @@ const urls = Object.keys(urlsMap);
 
 let doneCounter = 0;
 let errorCounter = 0;
+let skipCounter = 0;
+let bytesCounter = 0;
+const totalCounter = urls.length;
 
 function stats() {
   // console.log(`Done: ${doneCounter}; Errors: ${errorCounter}; Queue Length: ${urls.length}`);
@@ -72,6 +76,18 @@ function processNextUrl() {
   const requestedUrl = urls.shift();
 
   const normalizedUrl = (requestedUrl.startsWith('//')) ? `http:${requestedUrl}` : requestedUrl;
+
+  const excludeUrlsRegex = args["exclude-urls"];
+
+  if (excludeUrlsRegex && excludeUrlsRegex !== '') {
+    if (normalizedUrl.toString().match(excludeUrlsRegex)) {
+      ++skipCounter;
+
+      console.log(`Skipped excluded URL: ${normalizedUrl}`);
+
+      return Promise.resolve();
+    }
+  }
 
   return fetch(normalizedUrl).then(res => {
     if (!res.ok) {
@@ -100,6 +116,8 @@ function processNextUrl() {
       
       ++doneCounter;
 
+      bytesCounter += buffer.length;
+
       stats();
 
       console.log('Mirrored URL: ', normalizedUrl);
@@ -127,4 +145,6 @@ function processNextUrl() {
 console.log(`Fetching ${urls.length} URLs...`);
 const pool = new PromisePool(processNextUrl, args.concurrency);
 
-pool.start();
+pool.start().then(() => {
+  console.log(`Total URLs: ${totalCounter}. Fetched: ${doneCounter} (${bytesCounter} bytes). Skipped: ${skipCounter}. Errors: ${errorCounter}.`);
+});
