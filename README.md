@@ -9,5 +9,5 @@ Part of OBS.Live build tools.
 ```sh
 npm install
 
-node app.js --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4] [--concurrency=4]
+Usage: C:\Shared\StreamElements\Web\download-remote-assets\app.js --source=<source-folder-path> --dest=<destination-folder-path> [--types=jpg,png,svg,mp4,jpeg,webm] [--concurrency=4] [--exclude-urls=<regex>]
 ```
